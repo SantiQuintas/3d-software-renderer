@@ -9,15 +9,17 @@
 bool dibujarPixel(uint32_t* buffer, int x, int y, uint32_t color);
 void dibujarLinea(uint32_t* buffer, Punto2D* p0, Punto2D* p1, uint32_t color);
 void dibujarRectangulo(uint32_t* buffer, int alto, int ancho, uint32_t color, void* centro);
-void dibujarTriangulo(uint32_t* buffer, Punto2D* v0 , Punto2D* v1, Punto2D* v2, uint32_t color);
+void dibujarTriangulo(uint32_t* buffer, Punto2D* v0 , Punto2D* v1, Punto2D* v2, uint32_t color, bool relleno);
 void dibujarCirculo(uint32_t* buffer, int radio, uint32_t color, void* centro);
 void limpiarBuffer(uint32_t* buffer);
 void vectorObtenerDePuntos(vec3D p1, vec3D p2, vec3D* vector);
+void vector2DObtenerDePuntos(Punto2D p1, Punto2D p2, vec2D* vector);
 Punto3D rotarY(Punto3D* p, float angulo);
 Punto2D proyectarEn2D(Punto3D* p);
 void productoVectorial(vec3D p1, vec3D p2, vec3D* ort);
 float productoEscalar(vec3D v1, vec3D v2);
 float normaVec(vec3D v1);
+bool puntoDentroDeCara(Punto2D a, Punto2D b, Punto2D c, Punto2D p);
 
 int main()
 {   
@@ -174,10 +176,10 @@ int main()
         vectorObtenerDePuntos(p0R, p2R, &vec2);
         productoVectorial(vec1, vec2, &ort);
         direccion = productoEscalar(ort, ortogonalCamara)/ (normaVec(ort) * normaVec(ortogonalCamara));
-        if(direccion < 0)
+        if(direccion > 0)
         {
-            dibujarTriangulo(frameBuffer, &v0, &v1, &v2, blanco);
-            dibujarTriangulo(frameBuffer, &v0, &v2, &v3, blanco);
+            dibujarTriangulo(frameBuffer, &v0, &v1, &v2, blanco, false);
+            dibujarTriangulo(frameBuffer, &v0, &v2, &v3, blanco, false);
         }
 
         
@@ -186,10 +188,10 @@ int main()
         vectorObtenerDePuntos(p0R, p5R, &vec2);
         productoVectorial(vec1, vec2, &ort);
         direccion = productoEscalar(ort, ortogonalCamara)/ (normaVec(ort) * normaVec(ortogonalCamara));
-        if(direccion > 0)
+        if(direccion < 0)
         {
-            dibujarTriangulo(frameBuffer, &v0, &v4, &v5, blanco);
-            dibujarTriangulo(frameBuffer, &v0, &v1, &v5, blanco);
+            dibujarTriangulo(frameBuffer, &v0, &v4, &v5, blanco, true);
+            dibujarTriangulo(frameBuffer, &v0, &v1, &v5, blanco, true);
         }
 
 
@@ -198,10 +200,10 @@ int main()
         vectorObtenerDePuntos(p0R, p7R, &vec2);
         productoVectorial(vec1, vec2, &ort);
         direccion = productoEscalar(ort, ortogonalCamara)/ (normaVec(ort) * normaVec(ortogonalCamara));
-        if(direccion < 0)
+        if(direccion > 0)
         {   
-            dibujarTriangulo(frameBuffer, &v0, &v4, &v7, blanco);
-            dibujarTriangulo(frameBuffer, &v7, &v3, &v0, blanco);
+           dibujarTriangulo(frameBuffer, &v0, &v4, &v7, blanco, true);
+           dibujarTriangulo(frameBuffer, &v7, &v3, &v0, blanco, true);
         }
 
 
@@ -212,8 +214,8 @@ int main()
         direccion = productoEscalar(ort, ortogonalCamara)/ (normaVec(ort) * normaVec(ortogonalCamara));
         if(direccion > 0)
         {
-            dibujarTriangulo(frameBuffer, &v6, &v5, &v2, blanco);
-            dibujarTriangulo(frameBuffer, &v5, &v2, &v1, blanco);
+            dibujarTriangulo(frameBuffer, &v6, &v5, &v2, blanco, true);
+            dibujarTriangulo(frameBuffer, &v5, &v2, &v1, blanco, true);
         }
 
 
@@ -224,8 +226,8 @@ int main()
         direccion = productoEscalar(ort, ortogonalCamara)/ (normaVec(ort) * normaVec(ortogonalCamara));
         if(direccion > 0)
         {
-            dibujarTriangulo(frameBuffer, &v7, &v6, &v2, blanco);
-            dibujarTriangulo(frameBuffer, &v7, &v2, &v3, blanco);
+            dibujarTriangulo(frameBuffer, &v7, &v6, &v2, blanco, true);
+            dibujarTriangulo(frameBuffer, &v7, &v2, &v3, blanco, true);
         }
 
 
@@ -236,8 +238,8 @@ int main()
         direccion = productoEscalar(ort, ortogonalCamara)/ (normaVec(ort) * normaVec(ortogonalCamara));
         if(direccion < 0)
         {
-            dibujarTriangulo(frameBuffer, &v7, &v4, &v6, blanco);
-            dibujarTriangulo(frameBuffer, &v4, &v5, &v6, blanco);
+           dibujarTriangulo(frameBuffer, &v7, &v4, &v6, blanco, false);
+           dibujarTriangulo(frameBuffer, &v4, &v5, &v6, blanco, false);
         }
 
 
@@ -249,6 +251,57 @@ int main()
     }
     SDL_DestroyWindow(window);
     SDL_Quit();
+}
+
+
+bool puntoDentroDeCara(Punto2D a, Punto2D b, Punto2D c, Punto2D p)
+{
+    Punto2D ab, ac, ap;
+    Punto2D ba, bc, bp;
+    Punto2D ca, cb, cp;
+
+    float z1, z2;
+    float z3, z4;
+    float z5, z6;
+    bool cond1=false, cond2=false, cond3=false;
+    vector2DObtenerDePuntos(a, b, &ab);
+    vector2DObtenerDePuntos(a, c, &ac);
+    vector2DObtenerDePuntos(a, p, &ap);
+
+    vector2DObtenerDePuntos(b, a, &ba);
+    vector2DObtenerDePuntos(b, c, &bc);
+    vector2DObtenerDePuntos(b, p, &bp);
+
+    vector2DObtenerDePuntos(c, a, &ca);
+    vector2DObtenerDePuntos(c, b, &cb);
+    vector2DObtenerDePuntos(c, p, &cp);
+
+    // AB X AC
+    z1 = ab.x * ac.y - ab.y * ac.x;
+    // AB X AP
+    z2 = ab.x * ap.y - ab.y * ap.x;
+
+    // BC X BA
+    z3 = bc.x * ba.y - bc.y * ba.x;
+    // BC X BP
+    z4 = bc.x * bp.y - bc.y * bp.x;
+
+    // CA X CB
+    z5 = ca.x * cb.y - ca.y * cb.x;
+    // CA X CP
+    z6 = ca.x * cp.y - ca.y * cp.x;
+
+    cond1 = (z1 > 0 && z2 > 0) || (z1 < 0 && z2 < 0);
+    cond2 = (z3 > 0 && z4 > 0) || (z3 < 0 && z4 < 0);
+    cond3 = (z5 > 0 && z6 > 0) || (z5 < 0 && z6 < 0);    
+
+    return cond1 && cond2 && cond3;
+}
+
+void vector2DObtenerDePuntos(Punto2D p1, Punto2D p2, vec2D* vector)
+{
+    vector->x = p2.x - p1.x;
+    vector->y = p2.y - p1.y;
 }
 float normaVec(vec3D v1)
 {
@@ -266,9 +319,9 @@ void vectorObtenerDePuntos(vec3D p1, vec3D p2, vec3D* vector)
 }
 void productoVectorial(vec3D p1, vec3D p2, vec3D* ort)
 {
-    ort->x =  p1.y * p2.z + p1.z * p2.y;
-    ort->y =  p1.z * p2.x + p1.x * p2.z;
-    ort->z =  p1.x * p2.y + p1.y * p2.x;
+    ort->x =  p1.y * p2.z - p1.z * p2.y;
+    ort->y =  p1.z * p2.x - p1.x * p2.z;
+    ort->z =  p1.x * p2.y - p1.y * p2.x;
 }
 
 void limpiarBuffer(uint32_t* buffer)
@@ -276,11 +329,26 @@ void limpiarBuffer(uint32_t* buffer)
     memset(buffer, 0, SCREEN_H*SCREEN_W * sizeof(uint32_t));
 }
 
-void dibujarTriangulo(uint32_t* buffer, Punto2D* v0 , Punto2D* v1, Punto2D* v2, uint32_t color)
+void dibujarTriangulo(uint32_t* buffer, Punto2D* v0 , Punto2D* v1, Punto2D* v2, uint32_t color, bool relleno)
 {
     dibujarLinea(buffer, v0, v1, color);
     dibujarLinea(buffer, v1, v2, color);
     dibujarLinea(buffer, v2, v0, color);
+    if(relleno)
+    {
+        for(int i = 0; i < SCREEN_H ; i++)
+        {
+            Punto2D p;
+            p.y = i;
+            for(int j = 0; j < SCREEN_W ; j++)
+            {   
+                p.x = j;
+                if(puntoDentroDeCara(*v0, *v1, *v2, p))
+                dibujarPixel(buffer, p.x, p.y, blanco);
+            }
+                
+        }
+    }
 }
 Punto3D rotarY(Punto3D* p, float angulo)
 {   

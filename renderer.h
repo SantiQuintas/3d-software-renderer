@@ -37,6 +37,8 @@ typedef struct
 } Punto3D;
 
 typedef Punto3D vec3D;
+typedef Punto2D vec2D;
+
 void puntoCrear(Punto2D* p, int x, int y);
 void punto3DCrear(Punto3D* p, float x, float y, float z);
 #endif //RENDERER_H
