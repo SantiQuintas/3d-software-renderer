@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
     Punto3D cam;
     punto3DCrear(&cam, 0.0, 0.0, 0.0);
     Mesh cubo;
-    cuboCrear(&cubo, cam, 1, 1, 1);
+    cuboCrear(&cubo, cam, 2, 2, 2);
 
     while(running)
     {   
@@ -72,7 +72,7 @@ int main(int argc, char *argv[])
         //PROCESAMIENTO
         
         dibujarMesh(frameBuffer, zBuffer, &cubo, blanco);
-        rotarMesh(&cubo, angulo, true, true, false);
+        rotarMesh(&cubo, angulo, true, true, true);
         angulo+=90*tiempoDelta;
         
         //RENDERIZADO

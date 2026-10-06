@@ -104,20 +104,98 @@ Punto3D sumarPuntos3D(Punto3D p1, Punto3D p2)
     suma.z = p1.z + p2.z;
     return suma;
 }
-void rotarMesh(Mesh *mesh, float angulo, bool x, bool y, bool z)
+
+matriz3 multiplicarMatrices(matriz3 a, matriz3 b)
 {
+    matriz3 r;
+
+    r.m[0][0] = a.m[0][0] * b.m[0][0] + a.m[0][1] * b.m[1][0] +a.m[0][2] * b.m[2][0];
+    r.m[0][1] = a.m[0][0] * b.m[0][1] + a.m[0][1] * b.m[1][1] +a.m[0][2] * b.m[2][1];
+    r.m[0][2] = a.m[0][0] * b.m[0][2] + a.m[0][1] * b.m[1][2] +a.m[0][2] * b.m[2][2];
+
+    r.m[1][0] = a.m[1][0] * b.m[0][0] + a.m[1][1] * b.m[1][0] +a.m[1][2] * b.m[2][0];
+    r.m[1][1] = a.m[1][0] * b.m[0][1] + a.m[1][1] * b.m[1][1] +a.m[1][2] * b.m[2][1];
+    r.m[1][2] = a.m[1][0] * b.m[0][2] + a.m[1][1] * b.m[1][2] +a.m[1][2] * b.m[2][2];
+
+    r.m[2][0] = a.m[2][0] * b.m[0][0] + a.m[2][1] * b.m[1][0] +a.m[2][2] * b.m[2][0];
+    r.m[2][1] = a.m[2][0] * b.m[0][1] + a.m[2][1] * b.m[1][1] +a.m[2][2] * b.m[2][1];
+    r.m[2][2] = a.m[2][0] * b.m[0][2] + a.m[2][1] * b.m[1][2] +a.m[2][2] * b.m[2][2];
+    return r;
+}
+
+void construirMatrices(matriz3* id, matriz3* x, matriz3* y, matriz3* z, float angulo)
+{
+    for (int i = 0; i < 3; i++)
+    {
+        for (int j = 0; j < 3; j++)
+        {
+             if(i==j)
+                id->m[i][j] = 1.0f;
+            else
+                id->m[i][j] = 0.0f;
+        }
+    }
+
+
+      
+
+    x->m[0][0] = 1.0;
+    x->m[0][1] = 0.0;
+    x->m[0][2] = 0.0;
+
+    x->m[1][0] = 0.0;
+    x->m[1][1] = cos(angulo);
+    x->m[1][2] = (-1)*sin(angulo);
+
+    x->m[2][0] = 0.0;
+    x->m[2][1] = sin(angulo);
+    x->m[2][2] = cos(angulo);
+
+                
+    y->m[0][0] = cos(angulo);
+    y->m[0][1] = 0.0;
+    y->m[0][2] = (-1)* sin(angulo);
+
+    y->m[1][0] = 0.0;
+    y->m[1][1] = 1.0;
+    y->m[1][2] = 0.0;
+
+    y->m[2][0] = sin(angulo);
+    y->m[2][1] = 0.0;
+    y->m[2][2] = cos(angulo);
+                
+    z->m[0][0] = cos(angulo);
+    z->m[0][1] = (-1) * sin(angulo);
+    z->m[0][2] = 0.0;
+
+    z->m[1][0] = sin(angulo);
+    z->m[1][1] = cos(angulo);
+    z->m[1][2] = 0.0;
+
+    z->m[2][0] = 0.0;
+    z->m[2][1] = 0.0;
+    z->m[2][2] = 1.0 ;
+}
+void rotarMesh(Mesh *mesh, float angulo, bool x, bool y, bool z)
+{   
+    float a = angulo*(PI/180);
+    matriz3 rx,ry,rz,resultado, identidad;
+    construirMatrices(&identidad, &rx,&ry,&rz, a);
+    if(!x)
+        rx = identidad;
+    if(!y)
+        ry = identidad;
+    if(!z)
+        rz= identidad;
+
+    resultado = multiplicarMatrices(rz,  multiplicarMatrices(ry,rx));
     for(int i=0; i < mesh->cantV ; i++)
     {   
+        Punto3D* verticeO = mesh->vertices+i;
         Punto3D* vertice = mesh->verticesR+i;
-        Punto3D resultado = *(mesh->vertices+i);
-        if(x)
-           resultado = rotarX(&resultado, angulo);
-        if(y)
-           resultado = rotarY(&resultado, angulo);
-        if(z)
-           resultado = rotarZ(&resultado, angulo);
-
-       *vertice = resultado;
+        vertice->x = resultado.m[0][0] * verticeO->x + resultado.m[0][1]* verticeO->y+ resultado.m[0][2]* verticeO->z;
+        vertice->y = resultado.m[1][0]* verticeO->x + resultado.m[1][1]* verticeO->y + resultado.m[1][2]* verticeO->z;
+        vertice->z = resultado.m[2][0]* verticeO->x + resultado.m[2][1]* verticeO->y + resultado.m[2][2]* verticeO->z;   
     }
 }
 
@@ -129,35 +207,9 @@ Punto3D rotarY(Punto3D* p, float angulo)
     float zLocal = p->z;
 
     Punto3D pNuevo;
-    pNuevo.x = p->x * cos(a) - zLocal * sin(a);
+    pNuevo.x = p->x * cos(a) - zLocal * sin(a); // p->x * matriz[0][0](1*cos(a)) - zLocal * matriz[0][2] 
     pNuevo.y = p->y;
     pNuevo.z = p->x * sin(a) + zLocal * cos(a);
-    return pNuevo;
-}
-
-Punto3D rotarX(Punto3D* p, float angulo)
-{   
-    float a = angulo * (PI/180);
-    float zLocal = p->z;
-
-    Punto3D pNuevo;
-    pNuevo.x = p->x;
-    pNuevo.y = p->y * cos(a) - zLocal * sin(a);
-    pNuevo.z = p->y * sin(a) + zLocal * cos(a);
-
-    return pNuevo;
-}
-
-Punto3D rotarZ(Punto3D* p, float angulo)
-{   
-    float a = angulo * (PI/180);
-    float zLocal = p->z;
-
-    Punto3D pNuevo;
-    pNuevo.x = p->x * cos(a) +  p->y * sin(a) ;
-    pNuevo.y = p->x * sin(a) -  p->y * cos(a) ;
-    pNuevo.z = zLocal;
-
     return pNuevo;
 }
 
@@ -300,8 +352,6 @@ void dibujarTriangulo(uint32_t* buffer, float *zBuffer, Punto3D* p0 , Punto3D* p
     }
 
 }
-
-
 
 Punto2D proyectarEn2D(Punto3D* p)
 {   

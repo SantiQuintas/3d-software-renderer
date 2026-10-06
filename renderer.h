@@ -67,6 +67,12 @@ typedef struct
 
 } Mesh;
 
+typedef struct
+{
+    float m[3][3];
+} matriz3;
+
+
 typedef Mesh Cubo;
 typedef Mesh Piramide;
 typedef Mesh Esfera;
@@ -100,6 +106,7 @@ void punto3DCrear(Punto3D* p, float x, float y, float z);
 void meshDestruir(Mesh *mesh);
 
 //GEOMETRIA
+matriz3 multiplicarMatrices(matriz3 a, matriz3 b);
 void vectorObtenerDePuntos(Punto3D p1, Punto3D  p2, vec3D* vector);
 void vector2DObtenerDePuntos(Punto2D p1, Punto2D p2, vec2D* vector);
 Punto2D proyectarEn2D(Punto3D* p);
@@ -110,7 +117,7 @@ float productoEscalar(vec3D v1, vec3D v2);
 float area2D(Punto2D a,Punto2D b,Punto2D c);
 float area3D(Punto3D a,Punto3D b,Punto3D c);
 Punto3D sumarPuntos3D(Punto3D p1, Punto3D p2);
-
+void construirMatrices(matriz3* id, matriz3* x, matriz3* y, matriz3* z, float angulo);
 
 
 //por las dudas no se si me va a volver a servir
