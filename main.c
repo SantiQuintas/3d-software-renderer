@@ -97,7 +97,7 @@ int main(int argc, char *argv[])
         //PROCESAMIENTO
         
         dibujarMesh(&cam,frameBuffer, zBuffer, &cubo, blanco);
-        rotarMesh(&cubo, angulo, true, true, true);
+        rotarMesh(&cubo, angulo, true, false, false);
         angulo+=90*tiempoDelta;
         
         //RENDERIZADO

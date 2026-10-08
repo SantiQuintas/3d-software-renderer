@@ -95,9 +95,24 @@ void dibujarMesh(Punto3D* cam,  uint32_t* buffer, float* zBuffer, Mesh* mesh, ui
         Punto3D  v1 = sumarPuntos3D(v1Real, *cam);
         Punto3D v2 = sumarPuntos3D(v2Real, *cam);
         Punto3D  v3 = sumarPuntos3D(v3Real, *cam);
-        printf("%f %f %f\n", v1.z,v2.z,v3.z);
-        if(!v1.z || !v2.z || !v3.z)
-            return;
+
+        //PROXIMO SISTEMA DE LUCES
+        /*
+        vec3D v1Cara;
+        vectorObtenerDePuntos(v1,v2, &v1Cara);
+        vec3D v2Cara;
+        vectorObtenerDePuntos(v1,v3, &v2Cara);
+        vec3D cara;
+        productoVectorial(v1Cara, v2Cara, &cara);
+
+        vec3D vecCam;
+        vectorObtenerDePuntos((Punto3D){.x=0,.y=0,.z=0},(Punto3D){.x=0,.y=0,.z=10}, &vecCam);
+        
+        float direccion = productoEscalar(cara, vecCam) / (normaVec(cara) * normaVec(vecCam));
+
+        if(direccion < 0)
+            color = 0xC0C0C0FF;
+        */
         dibujarTriangulo(buffer, zBuffer, &v1,&v2, &v3, color, true);
     }
     
@@ -345,7 +360,7 @@ void dibujarTriangulo(uint32_t* buffer, float *zBuffer, Punto3D* p0 , Punto3D* p
                     if((*(zBuffer+(SCREEN_W*i+j))== -1  && puntoDentroDeCara ) || (*(zBuffer+(SCREEN_W*i+j)) > zP && puntoDentroDeCara))
                     {
                         *(zBuffer+(SCREEN_W*i+j)) = zP;
-                        dibujarPixel(buffer, p.x, p.y, blanco);
+                        dibujarPixel(buffer, p.x, p.y, color);
                     }
                     
                 }
