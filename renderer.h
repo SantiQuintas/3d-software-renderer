@@ -95,7 +95,7 @@ void dibujarRectangulo(uint32_t* buffer, int alto, int ancho, uint32_t color, vo
 void dibujarTriangulo(uint32_t* buffer,float *zBuffer, Punto3D* v0 , Punto3D* v1, Punto3D* v2, uint32_t color, bool relleno);
 void dibujarCirculo(uint32_t* buffer, int radio, uint32_t color, void* centro);
 void limpiarBuffers(uint32_t* buffer, float* zBuffer);
-void dibujarMesh(uint32_t* buffer, float* zBuffer, Mesh* mesh, uint32_t color );
+void dibujarMesh(Punto3D* cam,  uint32_t* buffer, float* zBuffer, Mesh* mesh, uint32_t color);
 
 
 //CREAR GEOMETRICAS
@@ -118,7 +118,6 @@ float area2D(Punto2D a,Punto2D b,Punto2D c);
 float area3D(Punto3D a,Punto3D b,Punto3D c);
 Punto3D sumarPuntos3D(Punto3D p1, Punto3D p2);
 void construirMatrices(matriz3* id, matriz3* x, matriz3* y, matriz3* z, float angulo);
-
 
 //por las dudas no se si me va a volver a servir
 bool puntoDentroDeCara(Punto2D a, Punto2D b, Punto2D c, Punto2D p);

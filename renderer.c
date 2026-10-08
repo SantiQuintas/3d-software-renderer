@@ -84,7 +84,7 @@ void meshDestruir(Mesh *mesh)
     free(mesh->verticesR);
 }
 
-void dibujarMesh(uint32_t* buffer, float* zBuffer, Mesh* mesh, uint32_t color )
+void dibujarMesh(Punto3D* cam,  uint32_t* buffer, float* zBuffer, Mesh* mesh, uint32_t color )
 {
     for(int i=0; i < mesh->cantT ; i++)
     {   
@@ -92,7 +92,13 @@ void dibujarMesh(uint32_t* buffer, float* zBuffer, Mesh* mesh, uint32_t color )
         Punto3D v1Real = sumarPuntos3D(*(mesh->verticesR + triangulo->indices[0]), mesh->posicion);
         Punto3D v2Real = sumarPuntos3D(*(mesh->verticesR + triangulo->indices[1]), mesh->posicion);
         Punto3D v3Real = sumarPuntos3D(*(mesh->verticesR + triangulo->indices[2]), mesh->posicion);
-        dibujarTriangulo(buffer, zBuffer, &v1Real, &v2Real, &v3Real, color, true);
+        Punto3D  v1 = sumarPuntos3D(v1Real, *cam);
+        Punto3D v2 = sumarPuntos3D(v2Real, *cam);
+        Punto3D  v3 = sumarPuntos3D(v3Real, *cam);
+        printf("%f %f %f\n", v1.z,v2.z,v3.z);
+        if(!v1.z || !v2.z || !v3.z)
+            return;
+        dibujarTriangulo(buffer, zBuffer, &v1,&v2, &v3, color, true);
     }
     
 }
@@ -333,6 +339,8 @@ void dibujarTriangulo(uint32_t* buffer, float *zBuffer, Punto3D* p0 , Punto3D* p
                     b =  area2D(v0,p,v2) / area;
                     c =  area2D(v0,v1,p) / area;
                     zP = 1.0f/((1/z0)*a +(1/ z1) * b + (1/z2) * c);
+
+
                     bool puntoDentroDeCara = a >= 0 && b >= 0 && c >= 0;
                     if((*(zBuffer+(SCREEN_W*i+j))== -1  && puntoDentroDeCara ) || (*(zBuffer+(SCREEN_W*i+j)) > zP && puntoDentroDeCara))
                     {

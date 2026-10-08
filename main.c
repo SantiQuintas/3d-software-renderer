@@ -59,8 +59,33 @@ int main(int argc, char *argv[])
             {
                 running = false;
             }  
+            if(event.type == SDL_EVENT_KEY_DOWN)
+            {
+                switch(event.key.key)
+                {
+                    case SDLK_W:
+                        cam.z-=0.1;
+                        break;
+                    case SDLK_A:
+                            cam.x-=0.1;
+                            break;
+                    case SDLK_S:
+                        cam.z+=0.1;
+                        break;
+                    case SDLK_D:
+                            cam.x+=0.1;
+                            break;
+                    case SDLK_SPACE:
+                            cam.y-=0.1;
+                            break;
+                    case SDLK_LCTRL:
+                        cam.y+=0.1;
+                        break;
+                     
+                }
+                    
+            }
         }
-
         limpiarBuffers(frameBuffer, zBuffer);
 
         //Analizar ticks para regular los ticks por segundo al renderizar
@@ -71,7 +96,7 @@ int main(int argc, char *argv[])
 
         //PROCESAMIENTO
         
-        dibujarMesh(frameBuffer, zBuffer, &cubo, blanco);
+        dibujarMesh(&cam,frameBuffer, zBuffer, &cubo, blanco);
         rotarMesh(&cubo, angulo, true, true, true);
         angulo+=90*tiempoDelta;
         
